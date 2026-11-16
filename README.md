@@ -25,3 +25,33 @@ networks:
       config:
         - subnet: 10.5.0.0/16
 ```
+## Задание 3. Prometheus
+
+Добавлен сервис Prometheus, контейнер `kukharev-a-netology-prometheus`,
+порт 9090, конфигурация из папки `prometheus/`, данные в томе `prometheus_data`.
+
+```yaml
+version: '3'
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.36.2
+    container_name: kukharev-a-netology-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    networks:
+      - kukharev-a-my-netology-hw
+
+volumes:
+  prometheus_data: {}
+
+networks:
+  kukharev-a-my-netology-hw:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+```
