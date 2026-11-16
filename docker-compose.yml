@@ -20,8 +20,23 @@ services:
     networks:
       - kukharev-a-my-netology-hw
 
+  grafana:
+    image: grafana/grafana
+    container_name: kukharev-a-netology-grafana
+    user: "472"
+    ports:
+      - "80:3000"
+    volumes:
+      - ./grafana/custom.ini:/etc/grafana/custom.ini
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_PATHS_CONFIG=/etc/grafana/custom.ini
+    networks:
+      - kukharev-a-my-netology-hw
+
 volumes:
   prometheus_data: {}
+  grafana_data: {}
 
 networks:
   kukharev-a-my-netology-hw:
