@@ -55,3 +55,42 @@ networks:
       config:
         - subnet: 10.5.0.0/16
 ```
+## Задание 4. Pushgateway
+
+Добавлен сервис Pushgateway, контейнер `kukharev-a-netology-pushgateway`,
+порт 9091 открыт наружу. Сервис назван `pushgateway`, потому что на это имя
+ссылается `prometheus.yml` в блоке `scrape_configs`.
+
+```yaml
+version: '3'
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.36.2
+    container_name: kukharev-a-netology-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    networks:
+      - kukharev-a-my-netology-hw
+
+  pushgateway:
+    image: prom/pushgateway
+    container_name: kukharev-a-netology-pushgateway
+    ports:
+      - "9091:9091"
+    networks:
+      - kukharev-a-my-netology-hw
+
+volumes:
+  prometheus_data: {}
+
+networks:
+  kukharev-a-my-netology-hw:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+```

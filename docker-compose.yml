@@ -12,6 +12,14 @@ services:
     networks:
       - kukharev-a-my-netology-hw
 
+  pushgateway:
+    image: prom/pushgateway
+    container_name: kukharev-a-netology-pushgateway
+    ports:
+      - "9091:9091"
+    networks:
+      - kukharev-a-my-netology-hw
+
 volumes:
   prometheus_data: {}
 
