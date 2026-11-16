@@ -161,3 +161,68 @@ networks:
 
 Проверка: `docker ps` — три контейнера; страница Grafana открывается
 на `http://localhost` (порт 80), вход `kukharev-a` / `netology`.
+
+## Задание 6. Порядок запуска, перезапуски, сеть
+
+Настроена очерёдность: сначала `pushgateway`, затем `prometheus` (зависит от
+pushgateway), последней `grafana` (зависит от prometheus) — через `depends_on`.
+Для всех сервисов включён режим перезапуска `restart: always` — Docker поднимает
+контейнер после падения или перезагрузки ВМ. Все три контейнера работают
+в одной сети `kukharev-a-my-netology-hw`, поэтому обращаются друг к другу
+по именам сервисов. Запуск выполняется в detached-режиме: `docker compose up -d`.
+
+```yaml
+version: '3'
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.36.2
+    container_name: kukharev-a-netology-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    depends_on:
+      - pushgateway
+    restart: always
+    networks:
+      - kukharev-a-my-netology-hw
+
+  pushgateway:
+    image: prom/pushgateway
+    container_name: kukharev-a-netology-pushgateway
+    ports:
+      - "9091:9091"
+    restart: always
+    networks:
+      - kukharev-a-my-netology-hw
+
+  grafana:
+    image: grafana/grafana
+    container_name: kukharev-a-netology-grafana
+    user: "472"
+    ports:
+      - "80:3000"
+    volumes:
+      - ./grafana/custom.ini:/etc/grafana/custom.ini
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_PATHS_CONFIG=/etc/grafana/custom.ini
+    depends_on:
+      - prometheus
+    restart: always
+    networks:
+      - kukharev-a-my-netology-hw
+
+volumes:
+  prometheus_data: {}
+  grafana_data: {}
+
+networks:
+  kukharev-a-my-netology-hw:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+```

@@ -9,6 +9,9 @@ services:
     volumes:
       - ./prometheus/:/etc/prometheus/
       - prometheus_data:/prometheus
+    depends_on:
+      - pushgateway
+    restart: always
     networks:
       - kukharev-a-my-netology-hw
 
@@ -17,6 +20,7 @@ services:
     container_name: kukharev-a-netology-pushgateway
     ports:
       - "9091:9091"
+    restart: always
     networks:
       - kukharev-a-my-netology-hw
 
@@ -31,6 +35,9 @@ services:
       - grafana_data:/var/lib/grafana
     environment:
       - GF_PATHS_CONFIG=/etc/grafana/custom.ini
+    depends_on:
+      - prometheus
+    restart: always
     networks:
       - kukharev-a-my-netology-hw
 
