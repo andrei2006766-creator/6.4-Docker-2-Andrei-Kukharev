@@ -296,3 +296,15 @@ networks:
       config:
         - subnet: 10.5.0.0/16
 ```
+## Задание 8. Остановка и удаление контейнеров
+
+Все контейнеры остановлены и удалены одной командой:
+
+```bash
+docker compose down
+```
+
+Команда удалила три контейнера и сеть `kukharev-a-my-netology-hw`.
+Тома `prometheus_data` и `grafana_data` при этом сохранились — данные не потеряны.
+
+![docker compose down](screenshots/docker-compose-down.png)
