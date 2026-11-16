@@ -226,3 +226,73 @@ networks:
       config:
         - subnet: 10.5.0.0/16
 ```
+
+## Задание 7. Метрика, источник данных и график
+
+Метрика отправлена в Pushgateway:
+`echo "kukharev_a 5" | curl --data-binary @- http://localhost:9091/metrics/job/netology`
+
+В Grafana добавлен источник данных Prometheus с URL `http://prometheus:9090`
+(обращение по имени сервиса внутри общей сети). По этой метрике построен график
+и сохранён дашборд `kukharev-a-netology`.
+
+![docker ps](screenshots/docker-ps.png)
+
+![график Grafana](screenshots/grafana-graph.png)
+
+```yaml
+version: '3'
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.36.2
+    container_name: kukharev-a-netology-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    depends_on:
+      - pushgateway
+    restart: always
+    networks:
+      - kukharev-a-my-netology-hw
+
+  pushgateway:
+    image: prom/pushgateway
+    container_name: kukharev-a-netology-pushgateway
+    ports:
+      - "9091:9091"
+    restart: always
+    networks:
+      - kukharev-a-my-netology-hw
+
+  grafana:
+    image: grafana/grafana
+    container_name: kukharev-a-netology-grafana
+    user: "472"
+    ports:
+      - "80:3000"
+    volumes:
+      - ./grafana/custom.ini:/etc/grafana/custom.ini
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_PATHS_CONFIG=/etc/grafana/custom.ini
+    depends_on:
+      - prometheus
+    restart: always
+    networks:
+      - kukharev-a-my-netology-hw
+
+volumes:
+  prometheus_data: {}
+  grafana_data: {}
+
+networks:
+  kukharev-a-my-netology-hw:
+    name: kukharev-a-my-netology-hw
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+```
